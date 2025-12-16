@@ -447,8 +447,8 @@ def draw_tree(stdscr, buffer, start_y, start_x, active_lights):
                 pass
 
 
-def draw_big_quote(stdscr, quote_lines, center_y, left_margin, max_width):
-    start_x = left_margin
+def draw_big_quote(stdscr, quote_lines, center_y, left_margin, max_width, height):
+    start_x = max(0, left_margin)
     
     all_lines = []
     for text in quote_lines:
@@ -459,18 +459,24 @@ def draw_big_quote(stdscr, quote_lines, center_y, left_margin, max_width):
     total_height = len(all_lines)
     start_y = center_y - total_height // 2
     
-    try:
-        for i, line in enumerate(all_lines):
-            y = start_y + i
-            visible_line = line[:max_width - left_margin - 2]
-            clean_line = visible_line.replace('.', ' ').replace('o', '█')
+    for i, line in enumerate(all_lines):
+        y = start_y + i
+        if y < 0 or y >= height - 1:
+            continue
+        visible_line = line[:max(1, max_width - left_margin - 2)]
+        clean_line = visible_line.replace('.', ' ').replace('o', '█')
+        try:
             stdscr.addstr(y, start_x, clean_line, curses.color_pair(6) | curses.A_BOLD)
-        
-        subtitle_y = start_y + total_height + 2
+        except curses.error:
+            pass
+    
+    subtitle_y = start_y + total_height + 2
+    if 0 <= subtitle_y < height - 1:
         subtitle = "—  в с ё   с б у д е т с я"
-        stdscr.addstr(subtitle_y, start_x, subtitle, curses.color_pair(6) | curses.A_BOLD)
-    except curses.error:
-        pass
+        try:
+            stdscr.addstr(subtitle_y, start_x, subtitle, curses.color_pair(6) | curses.A_BOLD)
+        except curses.error:
+            pass
 
 
 def draw_snowflakes(stdscr, snowflakes, height, width):
@@ -559,7 +565,7 @@ def main(stdscr):
                     del active_lights[random.choice(list(active_lights.keys()))]
             
             snowflakes = draw_snowflakes(stdscr, snowflakes, height, width)
-            draw_big_quote(stdscr, current_quote, height // 2, left_margin, left_area)
+            draw_big_quote(stdscr, current_quote, height // 2, left_margin, left_area, height)
             
             quote_timer += 1
             if quote_timer > 50:
