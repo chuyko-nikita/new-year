@@ -7,14 +7,9 @@
 ## Запуск
 
 ```bash
+git clone https://github.com/chuyko-nikita/new-year.git
+cd new-year
 python3 new_year.py
-```
-
-Или добавьте alias:
-```bash
-echo 'alias newyear="python3 /path/to/new_year.py"' >> ~/.zshrc
-source ~/.zshrc
-newyear
 ```
 
 ## Особенности
