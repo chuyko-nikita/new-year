@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Фрактальная новогодняя ёлка (C + Python)
-Запуск: python3 new_year.py
-Выход: Q или Ctrl+C
-"""
 
 import curses
 import subprocess
@@ -13,8 +8,6 @@ import random
 import time
 from itertools import cycle
 
-# ASCII-арт шрифт из символов ёлки (. # o & j)
-# Каждая буква 7 строк высотой
 FONT = {
     'А': [
         "  .o.  ",
@@ -344,7 +337,6 @@ FONT = {
 
 
 def text_to_ascii(text):
-    """Преобразует текст в ASCII-арт"""
     lines = [""] * 7
     for char in text.upper():
         if char in FONT:
@@ -456,14 +448,13 @@ def draw_tree(stdscr, buffer, start_y, start_x, active_lights):
 
 
 def draw_big_quote(stdscr, quote_lines, center_y, left_margin, max_width):
-    """Рисует многострочную цитату ASCII-артом"""
     start_x = left_margin
     
     all_lines = []
     for text in quote_lines:
         ascii_lines = text_to_ascii(text)
         all_lines.extend(ascii_lines)
-        all_lines.append("")  # Пустая строка между фразами
+        all_lines.append("")
     
     total_height = len(all_lines)
     start_y = center_y - total_height // 2
@@ -472,12 +463,9 @@ def draw_big_quote(stdscr, quote_lines, center_y, left_margin, max_width):
         for i, line in enumerate(all_lines):
             y = start_y + i
             visible_line = line[:max_width - left_margin - 2]
-            # Убираем точки и заменяем o на яркий блок
             clean_line = visible_line.replace('.', ' ').replace('o', '█')
-            # Белый яркий
             stdscr.addstr(y, start_x, clean_line, curses.color_pair(6) | curses.A_BOLD)
         
-        # Подпись под фразой (с разрядкой для увеличения)
         subtitle_y = start_y + total_height + 2
         subtitle = "—  в с ё   с б у д е т с я"
         stdscr.addstr(subtitle_y, start_x, subtitle, curses.color_pair(6) | curses.A_BOLD)
@@ -502,12 +490,12 @@ def draw_snowflakes(stdscr, snowflakes, height, width):
 
 def main(stdscr):
     try:
-        curses.curs_set(0)  # Скрыть курсор
+        curses.curs_set(0)
     except:
         pass
     stdscr.nodelay(True)
     stdscr.timeout(100)
-    curses.mousemask(0)  # Отключить мышь
+    curses.mousemask(0)
     init_colors()
     
     height, width = stdscr.getmaxyx()
@@ -555,7 +543,7 @@ def main(stdscr):
             height, width = stdscr.getmaxyx()
             stdscr.clear()
             
-            left_area = width // 2  # Половина экрана для текста
+            left_area = width // 2
             right_margin = (width - left_area - tree_width) // 2
             tree_x = left_area + right_margin
             tree_y = max(1, (height - tree_height) // 2)
@@ -571,10 +559,8 @@ def main(stdscr):
                     del active_lights[random.choice(list(active_lights.keys()))]
             
             snowflakes = draw_snowflakes(stdscr, snowflakes, height, width)
-            
             draw_big_quote(stdscr, current_quote, height // 2, left_margin, left_area)
             
-            # Меняем цитату каждые ~5 секунд
             quote_timer += 1
             if quote_timer > 50:
                 quote_timer = 0
@@ -592,6 +578,4 @@ def main(stdscr):
 
 
 if __name__ == '__main__':
-    print("Compiling fractal tree...")
     curses.wrapper(main)
-    print("\n  С Новым 2025 Годом!\n")
